@@ -5,4 +5,4 @@
 
 (defpackage #:corruption
   (:use #:cl)
-  (:export #:corrupt-string))
+  (:export #:corrupt-string #:corrupt-writing))
