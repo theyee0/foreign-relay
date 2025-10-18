@@ -140,7 +140,7 @@ Serves to add noise and volume to interactions.")
   (let ((relationship (entity-relationship civilization)))
     (generate-conversation (gethash (cond
                                       ((<= -10 relationship -5) :rude)
-                                      ((< 5 relationship 5) :neutral)
+                                      ((< -5 relationship 5) :neutral)
                                       ((<= 5 relationship 10) :polite))
                                     +preamble-forms+)
                            random-state)))
@@ -164,7 +164,7 @@ Serves to add noise and volume to interactions.")
 (defun generate-body (random-state)
   "Generate a random set of items for the body of the letter"
   (let ((hash-set (make-hash-table))
-        (n (random-range 5 (length +body-forms+) random-state))
+        (n (random-range 7 (length +body-forms+) random-state))
         (conversation (make-array 1 :fill-pointer 0 :adjustable t))
         (keywords (make-array 1 :fill-pointer 0 :adjustable t)))
     (loop :while (< (hash-table-count hash-set) n)
@@ -180,7 +180,7 @@ Serves to add noise and volume to interactions.")
 (defun generate-salutation (sender address random-state)
   "Generate a salutation to someone"
   (let ((n (random (length +salutation-forms+) random-state)))
-    (format nil (aref +salutation-forms+ n) address) (entity-name sender)))
+    (format nil (aref +salutation-forms+ n) (entity-name sender) address)))
 
 (defun generate-signoff (sender random-state)
   "Generate a signoff to the letter"
