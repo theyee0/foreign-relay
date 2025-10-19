@@ -30,10 +30,12 @@
         (1+ y))))
 
 (defun get-input (window)
-  (let ((str ""))
-    (charms/ll:mvwgetstr (charms::window-pointer window) 0 0 str)
+  (let ((buf (cffi:foreign-alloc :char :count 1024)))
+    (charms/ll:mvwgetstr (charms::window-pointer window) 0 0 buf)
     (charms:clear-window window)
-    str))
+    (let ((str (cffi:foreign-string-to-lisp buf)))
+      (cffi:foreign-free buf)
+      str)))
 
 (defun make-buffer (name width height x y)
   (let ((border (charms:make-window width height x y))
