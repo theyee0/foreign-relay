@@ -149,7 +149,7 @@ Serves to add noise and volume to interactions.")
                                ((eq x :location) (random-vector-item +location-names+ random-state))))
                            (body-requirements body-form)))
         (keywords (body-keywords body-form)))
-    `(,(apply #'format nil phrase requirements) . ,(concatenate 'vector keywords requirements))))
+    (values (apply #'format nil phrase requirements) (concatenate 'vector keywords requirements))))
 
 (defun generate-body (random-state)
   "Generate a random set of items for the body of the letter"
@@ -162,20 +162,32 @@ Serves to add noise and volume to interactions.")
              (let ((r (random (length +body-forms+) random-state)))
                (when (not (gethash r hash-set))
                  (setf (gethash r hash-set) t)
-                 (let ((body-form (generate-body-form (aref +body-forms+ r) random-state)))
-                   (vector-push-extend (car body-form) conversation)
-                   (vector-push-extend (cdr body-form) keywords)))))
-    `(,conversation . ,keywords)))
+                 (multiple-value-bind (body-form keyword) (generate-body-form (aref +body-forms+ r) random-state)
+                   (vector-push-extend body-form conversation)
+                   (vector-push-extend keyword keywords)))))
+    (values conversation keywords)))
 
 (defun generate-salutation (sender address random-state)
   "Generate a salutation to someone"
   (let ((n (random (length +salutation-forms+) random-state)))
-    (format nil (aref +salutation-forms+ n) (civilization-name sender) address)))
+    (format nil (aref +salutation-forms+ n) (civilization-name sender) (civilization-name address))))
 
 (defun generate-signoff (sender random-state)
   "Generate a signoff to the letter"
   (let ((n (random (length +signoff-forms+) random-state)))
     (format nil (aref +signoff-forms+ n) (civilization-name sender))))
+
+(defun concat-words (word-list)
+  (apply #'concatenate 'string
+         (map 'list (lambda (x) (concatenate 'string x " ")) word-list)))
+
+(defun generate-message (sender address random-state)
+  (multiple-value-bind (body keywords) (generate-body random-state)
+    (values (vector (concat-words (generate-preamble sender random-state))
+                    (generate-salutation sender address random-state)
+                    (concat-words body)
+                    (generate-signoff sender random-state))
+            keywords)))
 
 (defun generate-civilizations (random-state)
   (map 'vector
