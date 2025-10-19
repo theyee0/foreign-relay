@@ -72,11 +72,11 @@
   (let ((y 0)
         (line "")
         (context ""))
+    (charms:clear-window echo)
     (loop :while (not (equal (setf line (get-input entry)) "<start>"))
           :do
              (setf y (print-words echo (concatenate 'string "[NOT IN MESSAGE]: " line) 0 y)))
-    (charms:clear-window echo)
-    (loop :while (not (equal (setf line (get-input entry)) "<done>"))
+    (loop :while (not (equal (setf line (get-input entry)) "<end>"))
           :do
              (setf y (print-words echo line 0 y))
              (setf context (concatenate 'string context line)))
