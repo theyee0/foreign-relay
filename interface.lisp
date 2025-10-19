@@ -9,26 +9,25 @@
         nil
         t)))
 
-(defun print-words (words window x y)
-  (multiple-value-bind (width height) (charms:window-dimensions window)
-    (loop :for word :in words
-          :do
-             (when (>= y (1- height))
-               (charms:write-string-at-point window "[Press any key to continue...]" 0 (1- height))
-               (charms:get-char window) ; Wait until a key has been pressed to continue
-               (charms:clear-window window)
-               (setf x 0)
-               (setf y 0))
-             (if (< (+ x (length word) 1) width)
-                 (progn
-                   (charms:write-string-at-point window (concatenate 'string word " ") x y)
-                   (setf x (+ x (length word) 1)))
-                 (progn
+(defun print-words (window words x y)
+  (if (stringp words)
+      (print-words window (uiop:split-string words :separator " ") x y)
+      (multiple-value-bind (width height) (charms:window-dimensions window)
+        (loop :for word :in words
+              :do
+                 (when (>= y (1- height))
+                   (charms:write-string-at-point window "[Press any key to continue...]" 0 (1- height))
+                   (charms:get-char window) ; Wait until a key has been pressed to continue
+                   (charms:clear-window window)
                    (setf x 0)
-                   (incf y)
-                   (charms:write-string-at-point window (concatenate 'string word " ") x y))))
-    (charms:refresh-window window)
-    y))
+                   (setf y 0))
+                 (when (>= (+ x (length word) 1) width)
+                   (setf x 0)
+                   (incf y))
+                 (charms:write-string-at-point window (concatenate 'string word " ") x y)
+                 (setf x (+ x (length word) 1)))
+        (charms:refresh-window window)
+        (1+ y))))
 
 (defun get-input (window)
   (let ((str ""))
@@ -53,3 +52,48 @@
               (make-buffer "Letter" halfwidth halfheight halfwidth 0)
               (make-buffer "Input" halfwidth halfheight halfwidth halfheight)
               (make-buffer "Entry" (* halfwidth 2) 3 0 (* halfheight 2))))))
+
+(defun matched-keywords (string keywords)
+  (reduce #'+
+          (map 'list
+               (lambda (x)
+                 (if (search x string) 1 0))
+               keywords)))
+
+(defun num-keywords (keywords)
+  (reduce #'+
+          (map 'list
+               #'length
+               keywords)))
+
+(defun get-context (entry echo keywords)
+  (let ((y 0)
+        (line "")
+        (context ""))
+    (loop :while (not (equal (setf line (get-input entry)) "<start>"))
+          :do
+             (setf y (print-words echo (concatenate 'string "[NOT IN MESSAGE]: " line) 0 y)))
+    (charms:clear-window echo)
+    (loop :while (not (equal (setf line (get-input entry)) "<done>"))
+          :do
+             (setf y (print-words echo line 0 y))
+             (setf context (concatenate 'string context line)))
+    (reduce #'+
+            (map 'list
+                 (lambda (x) (matched-keywords context x))
+                 keywords))))
+
+(defun print-letter (message window corruption-algorithm)
+  (charms:clear-window window)
+  (let ((y 0))
+    (setf y (print-words window "[PREFACE]" 0 y))
+    (setf y (print-words window (funcall corruption-algorithm (aref message 0)) 0 y))
+
+    (setf y (print-words window "[SALUTATION]" 0 y))
+    (setf y (print-words window (funcall corruption-algorithm (aref message 1)) 0 y))
+
+    (setf y (print-words window "[BODY]" 0 y))
+    (setf y (print-words window (funcall corruption-algorithm (aref message 2)) 0 y))
+
+    (setf y (print-words window "[CLOSING]" 0 y))
+    (setf y (print-words window (funcall corruption-algorithm (aref message 3)) 0 y))))
