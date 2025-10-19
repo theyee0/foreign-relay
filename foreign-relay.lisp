@@ -8,7 +8,8 @@
     (setf y (print-words window "Welcome to Foreign Relay, a game where you play the role of a relay station that intercepts letters and reformats them in non-corrupted form to pass them on. You will be responsible for identifying the keywords of the scrambled letter!" 0 0))
     (setf y (print-words window "You are able to enter things in the field at the bottom line by line. Once you receive a letter, you can start typing notes. They won't be considered until you type <start> and the program will consider all words until <end>" 0 y))
     (setf y (print-words window "Got it? Best of luck!" 0 y))
-    (setf y (print-words window "Press enter to start the game..." 0 y))))
+    (setf y (print-words window "Press enter to start the game..." 0 y))
+    y))
 
 (defun random-civilization (civilization-list)
   "Selects a random civilization from a provided list"
@@ -21,10 +22,10 @@
     (charms:refresh-window charms:*standard-window*)
     (if (verify-size)
         (multiple-value-bind (info letter echo entry) (make-interface)
-          (print-welcome-message info)
           (let ((info-line 0)
                 (command "")
                 (civilizations (generate-civilizations *random-state*)))
+            (setf info-line (print-welcome-message info))
             (loop :while (not (equal (setf command (get-input entry)) "<quit>"))
                   :do
                      (charms:clear-window letter)
