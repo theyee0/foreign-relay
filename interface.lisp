@@ -4,12 +4,16 @@
 (defconstant +min-height+ 25)
 
 (defun verify-size ()
+  "Ensure that the terminal is at least 80x25 characters; otherwise
+graphics will appear broken"
   (multiple-value-bind (width height) (charms:window-dimensions charms:*standard-window*)
     (if (or (< width +min-width+) (< height +min-height+))
         nil
         t)))
 
 (defun print-words (window words x y)
+  "Print words into a window, making sure to break the words at spaces rather than
+in the middle of a word"
   (if (stringp words)
       (print-words window (uiop:split-string words :separator " ") x y)
       (multiple-value-bind (width height) (charms:window-dimensions window)
@@ -30,6 +34,7 @@
         (1+ y))))
 
 (defun get-input (window)
+  "Takes input in a buffer and returns it as a string"
   (let ((buf (cffi:foreign-alloc :char :count 1024)))
     (charms/ll:mvwgetstr (charms::window-pointer window) 0 0 buf)
     (charms:clear-window window)
@@ -38,6 +43,7 @@
       str)))
 
 (defun make-buffer (name width height x y)
+  "Create a boxed window and return the inner portion"
   (let ((border (charms:make-window width height x y))
         (input (charms:make-window (- width 2) (- height 2) (1+ x) (1+ y))))
     (charms/ll:box (charms::window-pointer border) 0 0)
@@ -47,6 +53,7 @@
     input))
 
 (defun make-interface ()
+  "Build the user interface without populating any of the windows"
   (multiple-value-bind (width height) (charms:window-dimensions charms:*standard-window*)
     (let ((halfwidth (floor (/ width 2)))
           (halfheight (floor (/ (- height 3) 2))))
@@ -56,6 +63,7 @@
               (make-buffer "Entry" (* halfwidth 2) 3 0 (* halfheight 2))))))
 
 (defun matched-keywords (string keywords)
+  "Count the number of keywords in a string from a single list of keywords"
   (reduce #'+
           (map 'list
                (lambda (x)
@@ -63,12 +71,15 @@
                keywords)))
 
 (defun num-keywords (keywords)
+  "Count the number of keywords in a string from a matrix of keywords"
   (reduce #'+
           (map 'list
                #'length
                keywords)))
 
 (defun get-context (entry echo keywords)
+  "Prompt the user for their keyword summary of the letter, then
+return the number of words they got right"
   (let ((y 0)
         (line "")
         (context ""))
@@ -86,6 +97,7 @@
                  keywords))))
 
 (defun print-letter (message window corruption-algorithm)
+  "Prints the letter, with fields separated by headers"
   (charms:clear-window window)
   (let ((y 0))
     (setf y (print-words window "[PREFACE]" 0 y))

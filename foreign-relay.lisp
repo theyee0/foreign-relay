@@ -3,18 +3,19 @@
 (in-package #:foreign-relay)
 
 (defun print-welcome-message (window)
+  "Prints a welcome message with a basic guide on what the game is"
   (let ((y 0))
     (setf y (print-words window "Welcome to Foreign Relay, a game where you play the role of a relay station that intercepts letters and reformats them in non-corrupted form to pass them on. You will be responsible for identifying the keywords of the scrambled letter!" 0 0))
     (setf y (print-words window "You are able to enter things in the field at the bottom line by line. Once you receive a letter, you can start typing notes. They won't be considered until you type <start> and the program will consider all words until <end>" 0 y))
     (setf y (print-words window "Got it? Best of luck!" 0 y))
-    (setf y (print-words window "Press any key to start the game..." 0 y))
-    (charms:get-char window)
-    (charms:clear-window window)))
+    (setf y (print-words window "Press enter to start the game..." 0 y))))
 
 (defun random-civilization (civilization-list)
+  "Selects a random civilization from a provided list"
   (aref civilization-list (random (length civilization-list))))
 
 (defun main ()
+  "Entry point for the program"
   (setf *random-state* (make-random-state t))
   (charms:with-curses ()
     (charms:refresh-window charms:*standard-window*)

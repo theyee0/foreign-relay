@@ -1,8 +1,5 @@
 (in-package #:corruption)
 
-;; Letter Similarity Matrix, from Boles' and Clifford's 1989 paper
-;; Boles, D.B., Clifford, J.E. An upper- and lowercase alphabetic similarity matrix, with derived generation similarity values. Behavior Research Methods, Instruments, & Computers 21, 579–586 (1989). https://doi.org/10.3758/BF03210580
-;; Letters are ordered A-Za-z
 (defparameter +letter-similarity+
   `((467 225 225 242 216 275 216 266 175 208 242 192 233 275 216 275 208 292 200 200 275 266 200 233 242 167 225 142 175 158 158 175 117 258 125 133 150 158 167 192 150 167 167 167 133 192 167 167 175 125 150 133)
     (242 500 250 333 292 283 275 225 242 183 250 225 200 175 292 350 208 350 275 200 225 175 150 192 233 158 142 275 167 200 192 158 175 192 142 150 142 150 133 125 192 216 175 158 183 158 142 142 133 117 158 142)
@@ -55,16 +52,25 @@
     (150 158 142 133 233 150 150 167 158 150 125 150 283 208 142 133 117 142 133 125 225 242 392 158 175 125 175 150 216 150 167 175 183 208 192 175 150 167 350 275 150 167 175 183 242 183 333 325 500 192 242 258)
     (133 133 142 117 158 100 125 150 150 133 283 158 150 125 108 125 125 125 133 133 133 200 175 433 167 158 208 167 225 158 208 142 175 183 192 158 392 142 200 175 167 158 200 200 175 183 225 258 183 500 175 258)
     (167 158 158 150 158 125 167 200 133 208 192 150 158 142 192 158 150 125 142 142 250 216 167 216 300 167 233 250 216 250 216 175 366 250 175 266 216 158 216 225 208 233 275 225 216 192 358 350 258 233 500 192)
-    (142 133 158 133 150 208 142 158 142 125 167 175 183 275 125 142 142 158 208 142 158 158 175 167 125 442 250 183 283 133 292 158 192 183 192 158 200 142 192 233 175 192 167 258 333 183 233 175 266 242 233 500)))
+    (142 133 158 133 150 208 142 158 142 125 167 175 183 275 125 142 142 158 208 142 158 158 175 167 125 442 250 183 283 133 292 158 192 183 192 158 200 142 192 233 175 192 167 258 333 183 233 175 266 242 233 500))
+  "Letter Similarity Matrix, from Boles' and Clifford's 1989 paper
+Boles, D.B., Clifford, J.E. An upper- and lowercase alphabetic similarity matrix, with derived generation similarity values. Behavior Research Methods, Instruments, & Computers 21, 579–586 (1989). https://doi.org/10.3758/BF03210580
+Letters are ordered A-Za-z")
 
-;(defconstant +letter-similarity-scaling+ 0.03)
-(defparameter +letter-list+ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+(defparameter +letter-list+ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  "List of alphabetical digits, in alphabetical order. All uppercase letters
+come first, then the lowercase letters follow")
 
-(defconstant +character-corruption-probability+ 0.1)
-(defparameter +character-list+ "abcdefghijklmnopqrstuvwxyz.,!?-+_=")
-(defconstant +max-dropped-sections+ 3)
-(defconstant +max-scrambled-section-length+ 10)
-(defconstant +max-scrambled-sections+ 5)
+(defconstant +character-corruption-probability+ 0.1
+  "Defines probability that a given character will be corrupted")
+(defparameter +character-list+ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?-+_="
+  "Defines the complete list of potential characters")
+(defconstant +max-dropped-sections+ 3
+  "Number of substrings that can be dropped in a corruption")
+(defconstant +max-scrambled-section-length+ 10
+  "Max substring length that can be reversed to scramble")
+(defconstant +max-scrambled-sections+ 5
+  "Maximum number of substrings that can be scrambled")
 
 (defun select-subsection (left right random-state)
   "Select a random pair of numbers l, r such that left <= l <= r < right"
@@ -154,7 +160,6 @@ will overflow the floating point range"
                        x))
                  character-list)
             'string)))
-
 
 (defun corrupt-string (string random-state)
   "Given a string, return a corrupted version"

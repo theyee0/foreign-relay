@@ -1,6 +1,8 @@
 (in-package #:civilization)
 
 (defstruct civilization
+  "Structure representing a civilization, its relationship with you,
+and its potential strength in warfare"
   (name "")
   (technology :digital)
   (relationship 0)

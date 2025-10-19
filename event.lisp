@@ -1,6 +1,8 @@
 (in-package #:event)
 
 (defstruct body
+  "Structure representing a phrase in the body, which has
+required keywords for the player to guess"
   (phrases "")
   (requirements #())
   (keywords #()))
@@ -8,7 +10,8 @@
 (defparameter +salutation-forms+
   #("Greetings from ~A to ~A."
     "From ~A to the people of ~A:"
-    "From ~A: To whom it may concern in the land of ~A:"))
+    "From ~A: To whom it may concern in the land of ~A:")
+  "List of format strings for potential greetings")
 
 (defparameter +preamble-forms+
   #.(let ((ht (make-hash-table)))
@@ -101,12 +104,16 @@ Serves to add noise and volume to interactions.")
           (make-body
            :phrases #("We plan to start an expedition in ~A days covering the trek from ~A to ~A. The goal is to foster better bonds and to build infrastructure.")
            :requirements #(:number :location :location)
-           :keywords #("expedition" "bonds" "infrastructure"))))
+           :keywords #("expedition" "bonds" "infrastructure")))
+  "List of format strings that can be populated with names and numbers. Keywords are provided
+for the player to guess")
 
 (defparameter +signoff-forms+
   #("Regards, ~A"
     "Best, ~A"
-    "Signed, ~A"))
+    "Signed, ~A")
+  "List of potential ways the sender can end
+their message")
 
 (defun random-range (min max random-state)
   "Generate a random number between MIN and MAX"
@@ -178,10 +185,13 @@ Serves to add noise and volume to interactions.")
     (format nil (aref +signoff-forms+ n) (civilization-name sender))))
 
 (defun concat-words (word-list)
+  "Concatenates all the words in a vector, separating them by spaces"
   (apply #'concatenate 'string
          (map 'list (lambda (x) (concatenate 'string x " ")) word-list)))
 
 (defun generate-message (sender address random-state)
+  "Combines a preamble, salutation, body, and signoff into a single
+function."
   (multiple-value-bind (body keywords) (generate-body random-state)
     (values (vector (concat-words (generate-preamble sender random-state))
                     (generate-salutation sender address random-state)
@@ -190,6 +200,8 @@ Serves to add noise and volume to interactions.")
             keywords)))
 
 (defun generate-civilizations (random-state)
+  "Generates the list of civilizations with randomly assigned
+parameters."
   (map 'vector
        (lambda (x)
          (make-civilization :name x
