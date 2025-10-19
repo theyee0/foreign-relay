@@ -4,16 +4,21 @@
   (:use #:cl)
   (:export #:corrupt-string #:corrupt-writing))
 
-(defpackage #:event
+(defpackage #:civilization
   (:use #:cl)
+  (:export #:make-civilization #:civilization-name #:civilization-technology
+           #:civilization-relationship #:civilization-strength #:+location-names+
+           #:update-relationship #:simulate-war))
+
+(defpackage #:event
+  (:use #:cl #:civilization)
   (:export #:generate-salutation #:generate-preamble #:generate-body #:generate-signoff
-           #:make-entity #:entity-name #:entity-technology #:entity-relationship
-           #:entity-strength))
+           #:generate-civilizations))
 
 (defpackage #:interface
   (:use #:cl #:corruption #:event)
-  (:export #:verify-size #:print-words #:make-interface))
+  (:export #:verify-size #:print-words #:make-interface #:get-input))
 
 (defpackage #:foreign-relay
-  (:use #:cl #:interface)
+  (:use #:cl #:interface #:civilization)
   (:export #:main))

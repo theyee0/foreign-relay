@@ -8,6 +8,7 @@
   :serial t
   :depends-on ("cl-charms")
   :components ((:file "package")
+               (:file "civilization")
                (:file "corruption")
                (:file "event")
                (:file "interface")

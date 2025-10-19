@@ -1,19 +1,9 @@
 (in-package #:event)
 
-(defstruct entity
-  (name "")
-  (technology :digital)
-  (relationship 0)
-  (strength 0))
-
 (defstruct body
   (phrases "")
   (requirements #())
   (keywords #()))
-
-(defparameter +location-names+
-  #("Amplicon" "Stoglich" "Dustbloom" "Jarnok" "Velanor" "Vestraix" "Velastris" "Sailyra" "Aethrone" "Lutrifen" "Celikar" "Wecineri" "Aspetref" "Nailla" "Reyhat" "Seliniox" "Xyren" "Xerakkin" "Stailfark" "Raeltarn" "Aecinad" "Strenpallasi" "Usinalex" "Uranithul" "Parasolin" "Halamex" "Thaik" "Strail" "Quellmark" "Qwedsita" "Ceqigex" "Dellamin" "Dazzonile" "Mizle" "Delaxin" "Muxin" "Milaxor")
-  "A list of random, sci-fi-esque names that can be used at will")
 
 (defparameter +salutation-forms+
   #("Greetings from ~A to ~A."
@@ -137,7 +127,7 @@ Serves to add noise and volume to interactions.")
 
 (defun generate-preamble (civilization random-state)
   "Generate small talk and general discussion section of letter"
-  (let ((relationship (entity-relationship civilization)))
+  (let ((relationship (civilization-relationship civilization)))
     (generate-conversation (gethash (cond
                                       ((<= -10 relationship -5) :rude)
                                       ((< -5 relationship 5) :neutral)
@@ -180,9 +170,18 @@ Serves to add noise and volume to interactions.")
 (defun generate-salutation (sender address random-state)
   "Generate a salutation to someone"
   (let ((n (random (length +salutation-forms+) random-state)))
-    (format nil (aref +salutation-forms+ n) (entity-name sender) address)))
+    (format nil (aref +salutation-forms+ n) (civilization-name sender) address)))
 
 (defun generate-signoff (sender random-state)
   "Generate a signoff to the letter"
   (let ((n (random (length +signoff-forms+) random-state)))
-    (format nil (aref +signoff-forms+ n) (entity-name sender))))
+    (format nil (aref +signoff-forms+ n) (civilization-name sender))))
+
+(defun generate-civilizations (random-state)
+  (map 'vector
+       (lambda (x)
+         (make-civilization :name x
+                            :technology (if (= (random 2 random-state) 1) :digital :written)
+                            :relationship (random-range -10 11 random-state)
+                            :strength (random 1000 random-state)))
+       +location-names+))
