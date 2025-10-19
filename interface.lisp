@@ -6,33 +6,34 @@
 (defun verify-size ()
   (multiple-value-bind (width height) (charms:window-dimensions charms:*standard-window*)
     (if (or (< width +min-width+) (< height +min-height+))
-        (progn
-          (format t "Sorry, the game was designed with at least an 80x25 terminal in mind.")
-          nil)
+        nil
         t)))
 
-(defun print-words (words window)
+(defun print-words (words window x y)
   (multiple-value-bind (width height) (charms:window-dimensions window)
     (loop :for word :in words
-          :with x = 0 :and y = 0
           :do
-             (when (>= x (1- width))
-               (charms:write-string-at-point "[Press any key to continue...]" window 0 (1- height))
-               (charms:get-char window)
+             (when (>= y (1- height))
+               (charms:write-string-at-point window "[Press any key to continue...]" 0 (1- height))
+               (charms:get-char window) ; Wait until a key has been pressed to continue
+               (charms:clear-window window)
                (setf x 0)
-               (setf y 0)) ; Wait until a key has been pressed to continue
-
-             (if (< (+ x (length word)) width)
+               (setf y 0))
+             (if (< (+ x (length word) 1) width)
                  (progn
-                   (charms:write-string-at-point word window x y)
-                   (setf x (+ x (length word))))
+                   (charms:write-string-at-point window (concatenate 'string word " ") x y)
+                   (setf x (+ x (length word) 1)))
                  (progn
                    (setf x 0)
-                   (incf y))))))
+                   (incf y)
+                   (charms:write-string-at-point window (concatenate 'string word " ") x y))))
+    (charms:refresh-window window)
+    y))
 
 (defun get-input (window)
   (let ((str ""))
     (charms/ll:mvwgetstr (charms::window-pointer window) 0 0 str)
+    (charms:clear-window window)
     str))
 
 (defun make-buffer (name width height x y)
