@@ -13,12 +13,13 @@
 (defpackage #:event
   (:use #:cl #:civilization)
   (:export #:generate-salutation #:generate-preamble #:generate-body #:generate-signoff
-           #:generate-civilizations))
+           #:generate-civilizations #:generate-message))
 
 (defpackage #:interface
   (:use #:cl #:corruption #:event)
-  (:export #:verify-size #:print-words #:make-interface #:get-input))
+  (:export #:verify-size #:print-words #:make-interface #:get-input #:num-keywords
+           #:get-context #:print-letter))
 
 (defpackage #:foreign-relay
-  (:use #:cl #:interface #:civilization)
+  (:use #:cl #:interface #:civilization #:event)
   (:export #:main))
