@@ -6,7 +6,9 @@
   :license  "GNU GPL v3"
   :version "0.0.1"
   :serial t
+  :depends-on ("cl-charms")
   :components ((:file "package")
                (:file "corruption")
                (:file "event")
+               (:file "interface")
                (:file "foreign-relay")))
