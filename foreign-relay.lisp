@@ -24,7 +24,7 @@
           (let ((info-line 0)
                 (command "")
                 (civilizations (generate-civilizations *random-state*)))
-            (loop :while (setf command (get-input entry))
+            (loop :while (not (equal (setf command (get-input entry)) "<quit>"))
                   :do
                      (charms:clear-window letter)
                      (charms:clear-window echo)
@@ -38,8 +38,14 @@
                                            (lambda (x) (corruption:corrupt-writing x 0.03 *random-state*))))
                          (let ((correct (get-context entry echo keywords))
                                (total (num-keywords keywords)))
-                           (if (< correct (random total *random-state*))
-                               (update-relationship sender :succeeded *random-state*)
-                               (update-relationship sender :failed *random-state*))))))))
+                           (setf info-line (print-words info (format nil "You got ~A of ~A keywords in the letter." correct total) 0 info-line))
+                           (if (> correct (random total *random-state*))
+                               (progn
+                                 (setf info-line (print-words info (format nil "The sender, ~A, is pleased with your accuracy! Your relationship with them has strengthened!" (civilization-name sender)) 0 info-line))
+                                 (update-relationship sender :succeeded *random-state*))
+                               (progn
+                                 (setf info-line (print-words info (format nil "The sender, ~A, is displeased with your accuracy... They will reconsider before making your contact again." (civilization-name sender)) 0 info-line))
+                                 (update-relationship sender :failed *random-state*)))))
+                       (setf info-line (print-words info "The next letter is ready! Hit enter to continue." 0 info-line))))))
         (format t "A terminal width of at least 80x25 is required!~%")))
   (format t "Program ended. Hope to see you next time...~%"))
