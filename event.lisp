@@ -205,7 +205,7 @@ parameters."
   (map 'vector
        (lambda (x)
          (make-civilization :name x
-                            :technology (if (= (random 2 random-state) 1) :digital :written)
+                            :technology (if (< 0.5 (random 1.0 random-state)) :digital :written)
                             :relationship (random-range -10 11 random-state)
                             :strength (random 1000 random-state)))
        +location-names+))
