@@ -5,7 +5,7 @@ A game where you play the role of a outpost intercepting noisy signals and makin
 ## Demo
 For those who are unable to compile and run the program on their own systems, there is a short demo:
 
-[video link coming]
+https://github.com/user-attachments/assets/fadfef1f-68cd-4828-b3d9-ea6694d3b571
 
 ## Building
 The program requires the use of `asdf`, `quicklisp`, and `cl-charms`. All instructions assume that you have those installed already. Also, for the sake of simplicity, I'll use `sbcl` in the examples, but in theory any compliant lisp compiler should work equally well.
