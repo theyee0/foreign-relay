@@ -61,7 +61,7 @@ Letters are ordered A-Za-z")
   "List of alphabetical digits, in alphabetical order. All uppercase letters
 come first, then the lowercase letters follow")
 
-(defconstant +character-corruption-probability+ 0.1
+(defconstant +character-corruption-probability+ 0.07
   "Defines probability that a given character will be corrupted")
 (defparameter +character-list+ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?-+_="
   "Defines the complete list of potential characters")
@@ -69,7 +69,7 @@ come first, then the lowercase letters follow")
   "Number of substrings that can be dropped in a corruption")
 (defconstant +max-scrambled-section-length+ 10
   "Max substring length that can be reversed to scramble")
-(defconstant +max-scrambled-sections+ 5
+(defconstant +max-scrambled-sections+ 4
   "Maximum number of substrings that can be scrambled")
 
 (defun select-subsection (left right random-state)
