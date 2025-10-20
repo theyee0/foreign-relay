@@ -32,12 +32,16 @@
                      (charms:clear-window echo)
                      (let ((sender (random-civilization civilizations))
                            (address (random-civilization civilizations)))
-                       (setf info-line (print-words info (uiop:split-string "Decoding a letter!" :separator " ") 0 info-line))
+                       (setf info-line (print-words info (uiop:split-string "You've received a letter!" :separator " ") 0 info-line))
                        (multiple-value-bind (message keywords) (generate-message sender address *random-state*)
                          (print-letter message letter
                                        (if (eq (civilization-technology sender) :digital)
-                                           (lambda (x) (corruption:corrupt-string x *random-state*))
-                                           (lambda (x) (corruption:corrupt-writing x 0.03 *random-state*))))
+                                           (progn
+                                             (setf info-line (print-words info "Decoding the corrupted digital letter..." 0 info-line))
+                                             (lambda (x) (corruption:corrupt-string x *random-state*)))
+                                           (progn
+                                             (setf info-line (print-words info "Decoding the damaged physical letter..." 0 info-line))
+                                             (lambda (x) (corruption:corrupt-writing x 0.03 *random-state*)))))
                          (let ((correct (get-context entry echo keywords))
                                (total (num-keywords keywords)))
                            (setf info-line (print-words info (format nil "You got ~A of ~A keywords in the letter." correct total) 0 info-line))
